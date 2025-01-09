@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import logo from '/uber-logo.png'
+import axios from 'axios'
+import { UserDataContext } from '../context/UserContext'
 
 const UserSignUp = () => {
    
@@ -8,21 +10,26 @@ const UserSignUp = () => {
     const [lastName, setLastName ]= useState('')
     const [email, setEmail]= useState('')
     const [password, setPassword] = useState('')
-    const [userInfo, setUserInfo] = useState({
+    // const [userInfo, setUserInfo] = useState({
        
-    });
+    // });
+    const navigate = useNavigate();
+
+    const {user , setUser } = React.useContext(UserDataContext)
 
 
    
 
 
-    const submitHandler = (e)=>{
+    const submitHandler =async (e)=>{
         e.preventDefault();
+        console.log(email)
+        console.log(password)
         
-       const user= {
+       const newUser= {
             fullname: {
-                firstName: firstName,
-            lastName: lastName,
+                firstname: firstName,
+            lastname: lastName,
             },
             
             email: email,
@@ -30,9 +37,18 @@ const UserSignUp = () => {
 
         }
 
-        setUserInfo(user)
-        console.log(email)
-        console.log(userInfo);
+        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/users/register`,newUser)
+        console.log(response)
+        if(response.status === 201){
+            const data = response.data;
+            setUser(data.user);
+            localStorage.setItem('token', data.token);
+            navigate('/home');
+             
+        }
+
+        
+       
         setFirstName('')
         setLastName('')
         setEmail('')
@@ -90,7 +106,7 @@ const UserSignUp = () => {
             }}
             />
             <br />
-            <button type='submit' className='bg-lime-600 p-2 rounded text-white font-bold'>sign up</button>
+            <button type='submit' className='bg-lime-600 p-2 rounded text-white font-bold'>create account</button>
 
 
 
